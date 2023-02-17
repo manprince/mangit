@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+  
+  tasks:
+    - name: Get Linux Version
+      debug: msg="{{ ansible_distribution }} {{ ansible_distribution_version}}"

@@ -1,0 +1,37 @@
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+    #  - name: get service facts
+    #    service_facts:
+    #  - debug:
+    #      var: ansible_facts.services['firewalld'] 
+    - name: open port webmin
+      firewalld:
+        zone: public          
+        port: 10000/tcp
+        permanent: true 
+        immediate: yes
+        state: enabled
+    - name: open port nrpe
+      firewalld:
+        zone: public          
+        port: 5666/tcp
+        permanent: true 
+        immediate: yes
+        state: enabled        
+    - name: open port ufw
+      ufw:
+        rule: allow
+        port: '5666'
+        proto: tcp
+    - name: open port ufw
+      ufw:
+        rule: allow
+        port: '10000'
+        proto: tcp                
+      # when:
+      #   - ansible_distribution == 'CentOS' 

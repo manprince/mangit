@@ -1,0 +1,40 @@
+[sshd]
+port    = ssh
+logpath = %(sshd_log)s
+[sshd-ddos]
+port    = ssh
+logpath = %(sshd_log)s
+
+
+ /opt/zimbra/postfix/sbin/sendmail -f
+
+ https://linux.die.net/man/1/fail2ban-client
+
+fail2ban-client set DEFAULT addignoreip <IP>
+adds <IP> to the ignore list of <JAIL>
+194.105.205.42
+fail2ban-client  set zimbra-recipient addignoreip 119.82.248.97
+
+iptables -A INPUT -s 105.213.79.0/24 -j DROP
+iptables -A INPUT -s 113.172.0.0/16 -j DROP
+service iptables save
+ufw deny from 113.160.0.0/11 comment 'postfix-sasl'
+14.161.70.58
+ufw insert 100 drop from 14.161.70.58 to any postfix-sasl
+ufw delete <blocktype> from 113.172.0.0/16  comment 'postfix-sasl'
+ufw delete from 113.172.0.0/16  comment 'postfix-sasl'
+465
+22
+5666
+10000
+25
+8080
+7071
+7110
+7995
+7143
+7993
+7025
+7072
+80
+443

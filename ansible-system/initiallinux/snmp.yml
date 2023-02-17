@@ -1,0 +1,45 @@
+---
+- hosts: all
+  gather_facts: yes
+  #remote_user: root
+  become: yes
+  strategy: free
+
+  tasks:
+#Ubuntu
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+      when: 
+        ansible_distribution == 'Ubuntu'  
+    - name: Ubuntu .deb do dist-upgrade
+      apt: 
+        update_cache: yes
+        cache_valid_time: 1200
+        upgrade: no
+      when: 
+        ansible_distribution == 'Ubuntu'
+    - name: Ubuntu Install snmp
+      apt:
+        update_cache: yes
+        pkg: ['snmp', 'snmpd']
+        state: present
+      when: 
+        ansible_distribution == 'Ubuntu'
+#centos
+    - name: Centos install the latest version of snmp
+      yum:
+        name: ['net-snmp','net-snmp-utils']
+        state: present
+      when:
+        ansible_distribution == 'CentOS'  
+#all                
+    - name: copy snmp configuration
+      copy:
+        src: snmp/snmpd.conf
+        dest: /etc/snmp/snmpd.conf
+        mode: 0644
+    - name: Restart service snmp, in all cases
+      service:
+        name: snmpd
+        state: restarted

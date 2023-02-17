@@ -1,0 +1,34 @@
+---
+users:
+  - username: thanapon
+    passwd: "$6$w2mA9NADeHuaze$6BmqCsD.Q6cUFotlxBkt2UUDCYWx86AisIuGpFYxv76QXDA2fkwyRCIBRgaaGeaz8nfJW.Zrvh3wz7VoZAW/41"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/bin/bash"
+    mail: "thanapon_s@grouplease.co.th"
+    quit: no
+  - username: phanupong
+    passwd: "$6$jdie/ziD$msh4ugkOmw9.yC6tLOwX6NS2HkQdohE.Hsx.BpSjKf2rJrplULjpNejryJfpPnDqA6qbOCJEqoIs5yKuZfY8a/"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/bin/bash"
+    mail: "phanuphong.b@grouplease.co.th"
+    quit: no
+  - username: dumrongchai
+    passwd: "$6$9.Y7U074$PRD4dHwKTqT7eUQRaZy8OXqOFrhDxdlnNxaRUmOTlPOwzzfcUFhZQT74eiCdYRwumpHO9eTLURa3M8PXtjtJ6/"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/sbin/nologin"
+    mail: "dumrongchai.c@grouplease.co.th"
+    quit: yes    
+  - username: manyou
+    passwd: "$6$YWB9.P2YhSL$OcFkX0aLZj0t0GSiYJ58K/9jmD3sQ8W3j6zdgP3QzxfLZrwnMEuEcXSBFu7hQBWKZmQXIyG6rB7GXZofTl.6l/"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/bin/bash"
+    mail: "manyou.sri@grouplease.co.th"
+    quit: no
+#creat password by use command
+#'mkpasswd --method=SHA-512'
+#date -d '12/31/2022 00:00:00' +"%s"
+#for disable user	/sbin/nologin

@@ -1,0 +1,28 @@
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+  - name: Add Docker GPG key
+    apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+    when: 
+      ansible_distribution == 'Ubuntu'
+  - name: Add Docker APT repository
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+    when: 
+      ansible_distribution == 'Ubuntu'
+  - name: Install list of packages
+    apt:
+      name: ['apt-transport-https','ca-certificates','curl','software-properties-common','docker-ce']
+      state: present
+      update_cache: yes
+    when: 
+      ansible_distribution == 'Ubuntu'
+  - name: copy module configuration
+    copy:
+      src: daemon.json
+      dest: /etc/docker/daemon.json
+      mode: 0644          

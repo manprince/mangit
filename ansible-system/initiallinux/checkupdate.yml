@@ -1,0 +1,33 @@
+---
+- hosts: nonprod
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+  
+  tasks:
+    # This task updates our CentOS based systems
+    - name: .rpm upgrade server
+      yum: >
+        list=updates
+        update_cache=yes
+      register: yumoutput
+      when: >
+        ansible_distribution == 'CentOS'
+    - debug:
+        msg: "{{ yumoutput.results | map(attribute='name') | list }}"
+ 
+    # This task updates our Ubuntu based systems
+    # - name: .deb do dist-upgrade
+    #   apt: >
+    #     update_cache=yes
+    #     cache_valid_time=1200
+    #     upgrade=yes
+    #   when: >
+    #     ansible_distribution == 'Ubuntu'
+    - name:
+      command: apt list --upgradable
+      register: updates
+      when: >
+        ansible_distribution == 'Ubuntu'
+    - debug: var=updates.stdout_lines

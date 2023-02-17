@@ -1,0 +1,12 @@
+- hosts: all
+  gather_facts: yes
+  remote_user: hadoop
+  become: yes
+  #strategy: free
+
+  tasks:
+#Ubuntu
+    - name: restart worker
+      service:
+        name: airflow-worker
+        state: restarted

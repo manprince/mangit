@@ -1,0 +1,38 @@
+---
+
+- hosts: Switch
+  gather_facts: no
+  connection: local
+  vars_prompt:
+  - name: "mgmt_username"
+    prompt: "Username"
+    private: no
+  - name: "mgmt_password"
+    prompt: "Password"
+  tasks:
+  - name: SYS | Define provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}" 
+        username: "{{ mgmt_username }}"
+        password: "{{ mgmt_password }}"
+  #- name: Configure device
+    #ios_config:
+        #host: "{{ inventory_hostname }}"
+        #username: "{{ mgmt_username }}"
+        #password: "{{ mgmt_password }}"
+  - name: IOS | Show vlan
+    ios_command:
+      provider: "{{ provider }}"
+      commands:
+        - show vlan
+    register: run
+  - debug: msg="{{ run.stdout_lines }}"
+  - name: Configure VLAN
+    ios_config:
+      provider: "{{ provider }}"
+      parents: 
+        interface GigabitEthernet1/0/27
+      lines:
+        - vlan 99
+        - description Test Ansible

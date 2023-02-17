@@ -1,0 +1,67 @@
+---
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+#Ubuntu  
+    # - name: Ubuntu Install dependency prerequisites
+    #   apt:
+    #     update_cache: yes
+    #     pkg: ['dmidecode','hwdata','ucf','perl','libuniversal-require-perl','libwww-perl libparse-edid-perl','libproc-daemon-perl','libfile-which-perl',
+    #     'libhttp-daemon-perl','libxml-treepp-perl','libyaml-perl','libnet-cups-perl','libnet-ip-perl','libdigest-sha-perl','libsocket-getaddrinfo-perl',
+    #     'libtext-template-perl','libnet-snmp-perl','libcrypt-des-perl','libnet-nbname-perl','libfile-copy-recursive-perl','libparallel-forkmanager-perl']
+    #     state: present
+    #   when: 
+    #     ansible_distribution == 'Ubuntu'  
+    - name: Install a Inventory package
+      apt:
+        deb: https://github.com/fusioninventory/fusioninventory-agent/releases/download/2.5.2/fusioninventory-agent_2.5.2-1_all.deb
+      when:
+        ansible_distribution == 'Ubuntu'  
+    - name: Install a Collect package
+      apt:
+        deb: https://github.com/fusioninventory/fusioninventory-agent/releases/download/2.5.2/fusioninventory-agent-task-collect_2.5.2-1_all.deb
+      when:
+        ansible_distribution == 'Ubuntu'  
+    - name: Install a deploy  package
+      apt:
+        deb: https://github.com/fusioninventory/fusioninventory-agent/releases/download/2.5.2/fusioninventory-agent-task-deploy_2.5.2-1_all.deb
+      when:
+        ansible_distribution == 'Ubuntu'  
+    - name: Install a Network  package
+      apt:
+        deb: https://github.com/fusioninventory/fusioninventory-agent/releases/download/2.5.2/fusioninventory-agent-task-network_2.5.2-1_all.deb
+      when:
+        ansible_distribution == 'Ubuntu'          
+#centos
+    - name: Centos install plugin-copr
+      yum:
+        name: ['yum-plugin-copr']
+        state: present
+      when:
+        ansible_distribution == 'CentOS'     
+    - name: Centos install repository trasher/fusioninventory-agent
+      command: "sudo yum copr enable trasher/fusioninventory-agent -y"
+      when:
+        ansible_distribution == 'CentOS'             
+    - name: Centos install fusioninventory-agent
+      yum:
+        name: ['fusioninventory-agent','fusioninventory-agent-task-inventory']
+        state: present
+      when:
+        ansible_distribution == 'CentOS'    
+    - name: copy fusionincentory configuration
+      copy:
+        src: fusioninventory/agent.cfg
+        dest: /etc/fusioninventory/agent.cfg
+        mode: 0644    
+    - name: Restart service fusioninventory, in all cases
+      service:
+        name: fusioninventory-agent
+        state: restarted
+    - name: force start 
+      command: pkill -USR1 -f -P 1 fusioninventory-agent
+    

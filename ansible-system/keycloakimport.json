@@ -1,0 +1,91 @@
+{
+    "realm": "Dealer-portal",
+    "users": [
+        {
+            "username" : "thanapons",
+            "enabled" : true,
+            "totp" : false,
+            "emailVerified" : false,
+            "firstName" : "Thanapon",
+            "lastName" : "Srithundorn",
+            "email" : "thanapon_s@grouplease.co.th",
+            "credentials" : [ "password" : "1234",
+                "temporary" : false],
+            "disableableCredentialTypes" : [ ],
+            "requiredActions" : [ ],
+       
+            "realmRoles" : [ "offline_access", "uma_authorization", "dealer"  ],
+            "clientRoles" : {
+              "account" : [ "manage-account", "view-profile" ]
+            },
+            "attributes" : {
+              "dealerId" : "5930"
+            },
+          }
+      ]
+}
+
+
+{
+    "realm": "Dealer-portal",
+    "users": [
+        {
+            "username" : "thanapons",
+            "enabled" : true,
+            "totp" : false,
+            "emailVerified" : false,
+            "firstName" : "Thanapon",
+            "lastName" : "Srithundorn",
+            "email" : "thanapon_s@grouplease.co.th",
+            "credentials" : [
+                { type:"password",
+                   temporary: false,
+                   value: "1234"
+                }
+            ], 
+            
+            "disableableCredentialTypes" : [ ],
+            "requiredActions" : [ ],
+       
+            "realmRoles" : [ "offline_access", "uma_authorization", "dealer"  ],
+            "clientRoles" : {
+              "account" : [ "manage-account", "view-profile" ]
+            },
+            "attributes" : {
+              "dealerId" : "5930"
+            },
+          }
+      ]
+}
+
+{
+    "realm": "Dealer-portal",
+    "users": [
+        {
+            "username" : "thanapons",
+            "enabled" : true,
+            "totp" : false,
+            "emailVerified" : false,
+            "firstName" : "Thanapon",
+            "lastName" : "Srithundorn",
+            "email" : "thanapon_s@grouplease.co.th",
+            "credentials" : [
+                { type :"password",
+                  temporary : false,
+                  value : "1234"
+                }
+            ], 
+            
+            "disableableCredentialTypes" : [ ],
+            "requiredActions" : [ ],
+       
+            "realmRoles" : [ "offline_access", "uma_authorization", "dealer"  ],
+            "clientRoles" : {
+              "account" : [ "manage-account", "view-profile" ]
+            },
+            "attributes" : {
+              "dealerId" : "5930"
+            },
+          }
+      ]
+}

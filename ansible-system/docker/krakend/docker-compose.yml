@@ -1,0 +1,28 @@
+version: "3"
+services:
+  krakend_ce:
+    image: devopsfaith/krakend:1.4.1
+    volumes:
+      - .:/etc/krakend
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+  krakend_ce_2:
+    image: devopsfaith/krakend:1.4.1
+    volumes:
+      - .:/etc/krakend
+    ports:
+      - "8081:8080"
+      - "8091:8090"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s

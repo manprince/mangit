@@ -1,0 +1,67 @@
+---
+
+- hosts: hq_switch
+
+  gather_facts: no
+
+  connection: local
+
+ 
+
+  vars_prompt:
+
+  - name: "mgmt_username"
+
+    prompt: "Username"
+
+    private: no
+
+  - name: "mgmt_password"
+
+    prompt: "Password"
+
+
+
+  tasks:
+
+
+
+  - name: SYS | Define provider
+
+    set_fact:
+
+      provider:
+
+        host: "{{ inventory_hostname }}" 
+
+        username: "{{ mgmt_username }}"
+
+        password: "{{ mgmt_password }}"
+
+
+  - name: IOS | Set Time
+
+    ios_command:
+
+      provider: "{{ provider }}"
+
+      commands:
+
+        - clock set 10:12:40 14 dec 2018
+
+  
+  - name: IOS | Show Time     
+
+    ios_command:
+
+      provider: "{{ provider }}"
+
+      commands:
+
+        - show clock                              
+
+    register: run
+
+
+  - debug: msg="{{ run.stdout_lines }}"
+

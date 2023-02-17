@@ -1,0 +1,19 @@
+su zimbra
+mailq
+
+sudo -s
+postcat -vq 831E4475030      
+postsuper -d 78BE9477610 
+
+
+wget https://github.com/maxmind/geoip-api-c/releases/download/v1.6.11/GeoIP-1.6.11.tar.gz
+tar -xzvf GeoIP-1.6.11.tar.gz
+cd GeoIP-1.6.11
+./configure
+make
+make install
+
+echo "deb http://deb.goaccess.io/ $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list.d/goaccess.list
+wget -O - https://deb.goaccess.io/gnugpg.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/goaccess.gpg add -
+sudo apt-get update
+sudo apt-get install goaccess

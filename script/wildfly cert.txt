@@ -1,0 +1,10 @@
+pfsense
+/tmp/acme/glfi//glf-i.co.id/fullchain.cer   /tmp/acme/glfi//glf-i.co.id/glf-i.co.id.key
+glfi server
+$ openssl pkcs12 -export -in fullchain.cer -inkey glf-i.co.id.key -out server.p12 -name glfindo
+$ keytool -importkeystore -deststorepass glfindo -destkeypass glfindo -destkeystore /opt/sslcert/16022021/efinhonda.glf-i.co.id-2.jks -srckeystore server.p12 -srcstoretype PKCS12 -srcstorepass glfindo -alias glfindo
+$ cp efinhonda.glf-i.co.id-2.jks /opt/wildfly/standalone/configuration/efinhonda.glf-i.co.id-2.jks
+start service
+$ cd /opt/wildfly/bin
+$ screen ./standalone.sh &
+

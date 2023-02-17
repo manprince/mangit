@@ -1,0 +1,571 @@
+{
+    "version": 2,
+    "extra_config": {
+        "github_com/devopsfaith/krakend-gologging": {
+            "level": "WARNING",
+            "prefix": "[KRAKEND]",
+            "syslog": true,
+            "stdout": true,
+            "format": "default",
+            "custom_format": "%{message}"
+        }
+    },
+    "timeout": "30000ms",
+    "cache_ttl": "300s",
+    "output_encoding": "json",
+    "name": "limapik",
+    "port": 8080,
+    "endpoints": [{
+            "endpoint": "/services/count",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/glmobile/countall.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": false
+                },
+                {
+                    "url_pattern": "/efinance-app/messaging/lim/search_count",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "user_id",
+                "s_level",
+                "groups",
+                "user",
+                "userlist"
+            ]
+        },
+        {
+            "endpoint": "/services/od",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/glmobile/countod.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": false
+                },
+                {
+                    "url_pattern": "/efinance-app/messaging/lim/search_od",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "user_id",
+                "s_level",
+                "groups",
+                "userlist"
+            ]
+        },
+        {
+            "endpoint": "/services/detailcustomerlim",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "backend": [{
+                "url_pattern": "/glmobile/search_detail_customer-thanapon.php",
+                "encoding": "json",
+                "sd": "static",
+                "is_collection": true,
+                "method": "GET",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": true
+            }],
+            "querystring_params": [
+                "searchcontno"
+            ]
+        },
+        {
+            "endpoint": "/services/detailcustomer",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/glmobile/search_detail_customer.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": true
+                },
+                {
+                    "url_pattern": "/efinance-app/messaging/lim/search_detail_customer",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "searchcontno"
+            ]
+        },
+        {
+            "endpoint": "/services/gua_customer",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/glmobile/search_gua_customer.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": false
+                },
+                {
+                    "url_pattern": "/efinance-app/messaging/lim/search_gua_customer",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "searchcontno"
+            ]
+        },
+        {
+            "endpoint": "/services/telnote_cust-finwiz",
+            "method": "GET",
+            "output_encoding": "json",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/efinance-app/messaging/lim/search_telnote_customer",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                },
+                {
+                    "url_pattern": "/glmobile/search_telnote_customer.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "searchcontno"
+            ]
+        },
+        {
+            "endpoint": "/services/telnote_cust",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/glmobile/search_telnote_customer.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": false
+                },
+                {
+                    "url_pattern": "/efinance-app/messaging/lim/search_telnote_customer",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "searchcontno"
+            ]
+        },
+        {
+            "endpoint": "/services/getstaff",
+            "method": "GET",
+            "output_encoding": "string",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "backend": [{
+                "url_pattern": "/glmobile/getstaff.php",
+                "encoding": "string",
+                "sd": "static",
+                "is_collection": false,
+                "method": "GET",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }],
+            "querystring_params": [
+                "user_id",
+                "s_level"
+            ]
+        },
+        {
+            "endpoint": "/services/infocustomer",
+            "method": "GET",
+            "output_encoding": "json-collection",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false,
+                    "flatmap_filter": [{
+                        "type": "append",
+                        "args": ["LIM", "collection"]
+                    }]
+                }
+            },
+            "backend": [{
+                    "url_pattern": "/glmobile/search_info_customer.php",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "mapping": {
+                        "collection": "LIM"
+                    },
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://192.168.9.91"
+                    ],
+                    "disable_host_sanitize": false
+                },
+                {
+                    "url_pattern": "/efinance-app/messaging/lim/search_info_customer",
+                    "encoding": "json",
+                    "sd": "static",
+                    "is_collection": true,
+                    "method": "GET",
+                    "extra_config": {},
+                    "host": [
+                        "http://172.255.152.135:8080"
+                    ],
+                    "disable_host_sanitize": false
+                }
+            ],
+            "querystring_params": [
+                "searchcontno",
+                "searchTabian",
+                "user_id",
+                "user_sup",
+                "groups",
+                "s_level",
+                "limit",
+                "userlist"
+            ]
+        },
+        {
+            "endpoint": "/services/addcust-ad-test",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addCustomer_android_test.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        },
+        {
+            "endpoint": "/services/addcust-test",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addCustomer_test.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        },
+        {
+            "endpoint": "/services/addpayment-test",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addpayment_test.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        },
+        {
+            "endpoint": "/services/addpayment-ad",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addpayment.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "is_collection": true,
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        },
+        {
+            "endpoint": "/services/addpayment-ios",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addpayment_ios.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "is_collection": true,
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        },
+        {
+            "endpoint": "/services/addcust-ad",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addCustomer_android.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "is_collection": true,
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        },
+        {
+            "endpoint": "/services/addcust-ios",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "extra_config": {
+                "github.com/devopsfaith/krakend/proxy": {
+                    "sequential": false
+                }
+            },
+            "querystring_params": [
+                "*"
+            ],
+            "backend": [{
+                "url_pattern": "/glmobile/addCustomer_ios__.php",
+                "encoding": "no-op",
+                "sd": "static",
+                "is_collection": true,
+                "method": "POST",
+                "extra_config": {},
+                "host": [
+                    "http://192.168.9.91"
+                ],
+                "disable_host_sanitize": false
+            }]
+        }
+    ]
+}

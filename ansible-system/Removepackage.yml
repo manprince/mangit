@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: yes
+  strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+    - name: Remove "fusioninventory-agent" package
+      apt:
+        name: fusioninventory-agent
+        state: absent 
+      when:
+        ansible_distribution == 'Ubuntu'
+    
+    - name: Remove "fusioninventory-agent" package
+      yum:
+        name: fusioninventory-agent
+        state: absent 
+      when:
+        ansible_distribution == 'CentOS'

@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  traefik:
+    image: traefik:v2.0
+      ports:
+        - 88:80
+        - 443:443
+        - 8081:8080
+      volumes:
+        - taerifk/traefik.yml:/etc/traefik/traefik.yml
+        - /var/run/docker.sock:/var/run/docker.sock
+
+  whoami:
+    image: emilevauge/whoami
+      labels:
+        - traefik.enable=true
+        - traefik.frontend.rule=Host:localhost
+        - traefik.docker.network=local
+        - traefik.http.routers.whoami.rule=Host(`localhost`) && Path(`/whoami`)
+  wordpress:
+    image: wordpress
+    labels:
+      - traefik.http.routers.wordpress.rule=Host(`localhost`) && Path(`/wordpress`)
+volumes:
+  taerifk:
+    driver: local
+    driver_opts:
+      device: ${PWD}/taerifk
+      o: bind
+      type: none

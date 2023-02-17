@@ -1,0 +1,70 @@
+---
+- hosts: all
+ # gather_facts: yes
+  #remote_user: root
+  become: yes
+
+  tasks:
+    - include_vars: users.yml
+
+    # - name: install python2 ubuntu
+    #   apt:
+    #     name: python-simplejson
+    #     state: latest 
+    #   when:
+    #     ansible_distribution == 'Ubuntu'
+    #  - name: install python2 centos
+    #    yum: >
+    #      name=python27-python-simplejson
+    #      state=latest
+    #      update_cache=yes
+    #    when: >
+    #      ansible_distribution == 'CentOS'
+
+    # raw: sudo apt-get -y install python-simplejson
+    #https://docs.ansible.com/ansible/latest/modules/apt_module.html
+    - name: adduser
+      user: name={{ item.username }} shell={{ item.shell }} createhome=yes
+        comment={{ item.mail }}
+        password={{ item.passwd }}
+        expires={{ item.expire }}
+      #state=present  
+      loop: "{{users}}"
+      when: 
+        - item.quit == False
+    - name: "Setup | authorized key upload"
+      authorized_key: user={{ item.username }}
+        key="{{ lookup('file', 'pub_keys/{{ item.username }}.pub') }}"
+      #      path='/home/{{ item.username }}/.ssh/authorized_keys'
+      #      manage_dir=no
+     # state=present 
+      loop: "{{users}}"
+      when: item.quit == False
+    - name: "Sudoers | update sudoers file and validate"
+      lineinfile: "dest=/etc/sudoers
+        insertafter=EOF
+        line='{{ item.username }} ALL=(ALL) NOPASSWD: ALL'
+        regexp='^{{ item.username }} .*'
+        state=present"
+      when: 
+        - item.use_sudo == True
+        - item.quit == False
+      loop: "{{users}}"
+  #- name: 'Set expire date'
+  #  user:
+  #      name={{ item.username }}
+  #      expires={{ item.expire }}
+  #  when: '{{ item.expire }} == True'
+  #  with_items: '{{users}}'
+    - name: set nologin
+      user: name={{ item.username }} shell={{ item.shell }} 
+      loop: "{{users}}"
+      when: 
+        - item.quit == True
+    - name: Remove the user 
+      user:
+        name: "{{ item.username }}"
+        state: absent
+        remove: no
+      loop: "{{users}}"  
+      when: item.quit == True

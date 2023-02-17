@@ -1,0 +1,9 @@
+---
+mysql_root_password: "nextGr0uplease"
+http_host: "nextcloud.grouplease.co.th"
+http_conf: "nextcloud.grouplease.co.th.conf"
+http_port: "80"
+
+create user nextclouduser@localhost identified by 'nextGr0uplease';
+
+grant all privileges on nextcloud.* to nextclouduser@localhost identified by 'nextGr0uplease';

@@ -1,0 +1,17 @@
+- hosts: all
+  gather_facts: yes
+  #remote_user: root
+  become: yes
+  #strategy: free
+
+  tasks:
+#Ubuntu
+    - name: deploy airflowcfg
+      copy:
+        src: airflow/airflow.cfg
+        dest: /home/hadoop/airflow/airflow.cfg
+        mode: 0644
+    #- name: Restart service snmp, in all cases
+    #  service:
+    #    name: snmpd
+    #    state: restarted

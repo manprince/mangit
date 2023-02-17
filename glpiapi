@@ -1,0 +1,36 @@
+
+API token= user_token                       evvyEoE0VnlkjRcuV4BCw4WKO2Lqtx74xZkSpsky
+Application Token (app_token)   ZtFEJ84sqGl8KYJHKhUqFy28IqobOoi8rlT1FHw3
+Session-Token: "return from initSession"
+curl -X GET \
+-H 'Content-Type: application/json' \
+-H "Authorization: user_token evvyEoE0VnlkjRcuV4BCw4WKO2Lqtx74xZkSpsky" \
+-H "App-Token: ZtFEJ84sqGl8KYJHKhUqFy28IqobOoi8rlT1FHw3" \
+'https://glpi.grouplease.co.th/apirest.php/initSession'
+
+# ตย ส่งค่า สร้าง computer ใหม่
+curl -X POST \
+-H 'Content-Type: application/json' \
+-H "Session-Token: 6sumv9jtv1v87thasvng3s1mi0" \
+-H "App-Token: ZtFEJ84sqGl8KYJHKhUqFy28IqobOoi8rlT1FHw3" \
+-d '{"input": {"name": "My single computer", "serial": "12345"}}' \
+'https://glpi.grouplease.co.th/apirest.php/Computer'
+
+# ตย ส่งค่า สร้าง ticket ใหม่
+Title:name
+Description:Content
+Type:type
+Category:itilcategories_id
+curl -X POST \
+-H 'Content-Type: application/json' \
+-H "Session-Token: tilikvumueo9hnt8g50j541pm0" \
+-H "App-Token: ZtFEJ84sqGl8KYJHKhUqFy28IqobOoi8rlT1FHw3" \
+-d '{"input": {"name": "cccc","content":"ccccc", "itilcategories_id": "58", "type":"2","users_id_recipient":"27"}}' \
+'https://glpi.grouplease.co.th/apirest.php/Ticket'
+
+curl -X POST \
+-H 'Content-Type: application/json' \
+-H "Session-Token: tilikvumueo9hnt8g50j541pm0" \
+-H "App-Token: ZtFEJ84sqGl8KYJHKhUqFy28IqobOoi8rlT1FHw3" \
+-d '{"input": {"name": "cccc","content":"ccccc", "itilcategories_id": "58", "type":"2","users_id_recipient":"27"}}' \
+'https://glpi.grouplease.co.th/apirest.php/Ticket'

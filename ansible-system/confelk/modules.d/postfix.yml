@@ -1,0 +1,7 @@
+- type: log
+  paths:
+    - /var/log/mail.log*
+  exclude_files: [".gz$"]
+  fields:
+    postfix: true
+  fields_under_root: true

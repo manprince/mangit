@@ -1,0 +1,31 @@
+---
+
+- hosts: hq_switch
+  gather_facts: no
+  connection: local
+  vars_prompt:
+  - name: "mgmt_username"
+    prompt: "Username"
+    private: no
+  - name: "mgmt_password"
+    prompt: "Password"
+  tasks:
+  - name: SYS | Define provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}" 
+        username: "{{ mgmt_username }}"
+        password: "{{ mgmt_password }}"
+  - name: Config archive    
+    ios_config:
+      provider: "{{ provider }}"
+      parents: "archive"
+      lines:
+        - path ftp://172.255.152.244/$h-$t
+        - write-memory
+        - time-period 1440
+  - name: IOS | Save Config
+    ios_command:
+      provider: "{{ provider }}"
+      commands:
+        - write-memory

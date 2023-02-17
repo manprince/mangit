@@ -1,0 +1,24 @@
+- hosts: all
+  gather_facts: yes
+  remote_user: hadoop
+  become: yes
+  #strategy: free
+
+  tasks:
+#Ubuntu
+    - name: restart webserver
+      service:
+        name: airflow-webserver
+        state: restarted
+    - name: restart scheduler
+      service:
+        name: airflow-scheduler
+        state: restarted
+    - name: restart flower
+      service:
+        name: airflow-flower
+        state: restarted
+    - name: restart worker
+      service:
+        name: airflow-worker
+        state: restarted        

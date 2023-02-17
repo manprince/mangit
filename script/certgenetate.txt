@@ -1,0 +1,33 @@
+sudo ./certbot-auto certonly --manual --preferred-challenges=dns --email infra@grouplease.co.th --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d *.grouplease.co.th
+sudo ./certbot certonly --manual --preferred-challenges=dns --email infra@grouplease.co.th --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d *.grouplease.co.t
+
+renew
+certbot renew --text >> /etc/letsencrypt/logs/renew.txt
+
+
+mpc1Hx8lq2IbHr92jRs_XAUXsFx2jygSRqZc0Ghm
+
+curl -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+     -H "Authorization: Bearer mpc1Hx8lq2IbHr92jRs_XAUXsFx2jygSRqZc0Ghm" \
+     -H "Content-Type:application/json"
+
+Using the global API key    
+export CF_Key="efabbff2a379007aca99157d7f6c8307377ef"
+export CF_Email="infra@grouplease.co.th"
+export CF_Token="mpc1Hx8lq2IbHr92jRs_XAUXsFx2jygSRqZc0Ghm"
+Using the new cloudflare api token
+
+
+export CF_Account_ID="e2e3b67dee2e81f44696f67f64da438e"
+Zone
+CSD.co.th
+export CF_Zone_ID="e364f7f9e1ca8519d445bcd556144371"
+cpmi-insurance.com
+export CF_Zone_ID="e30233ce4c0be42e2b232e7ab65653c8"
+gl-e.com
+export CF_Zone_ID="a2bd7a01cf8770c5ab43c9c4048d03b8"
+tnbfinance.com
+export CF_Zone_ID="b4684fc3ea0d205de8dde85150c9c8d5"
+tnbcarbuy.com
+export CF_Zone_ID="b72a600206c900a2b2bec20cfb3692bc"
+acme.sh --issue --dns dns_cf -d tnbcarbuy.com -d *.tnbcarbuy.com

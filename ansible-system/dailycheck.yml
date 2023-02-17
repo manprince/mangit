@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+   # - include_vars: telsapp.yml
+
+    - name: check 28
+       wait_for: host=192.168.2.28 port=211 timeout=1
+       debug: msg=ok
+   #   loop: "{{users}}"

@@ -1,0 +1,32 @@
+- hosts: test
+  gather_facts: yes
+  #remote_user: root
+  become: yes
+  #strategy: free
+
+  tasks:
+#Ubuntu
+    - name: install ufw and fail2ban
+      copy:
+        src: airflow/airflow.cfg
+        dest: /home/hadoop/airflow/airflow.cfg
+        mode: 0644
+- name: copy action.d config
+      copy:
+        src: action.d/*
+        dest: /etc/fail2ban/action.d/
+        mode: 0644 
+- name: copy action.d config
+      copy:
+        src: filter.d/*
+        dest: /etc/fail2ban/filter.d/
+        mode: 0644
+- name: copy action.d config
+      copy:
+        src: jail.conf
+        dest: /etc/fail2ban/jail.conf
+        mode: 0644               
+- name: Restart service snmp, in all cases
+      service:
+        name: snmpd
+        state: restarted

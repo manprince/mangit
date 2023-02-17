@@ -1,0 +1,68 @@
+# Fail2Ban configuration file
+[DEFAULT] 
+ignoreip = 127.0.0.1/8 203.217.171.132/32 147.50.57.162/32 202.137.138.10/32 45.116.216.217/32 
+bantime = -1 
+findtime = 600  
+maxretry = 3
+backend = auto
+[ssh]
+enabled  = true
+port     = ssh
+filter   = sshd
+action = ufw[application="OpenSSH", blocktype=reject] 
+#sendmail-whois[name=SSH, dest=infra@grouplease.co.th, sender=admin@grouplease.international]
+logpath  = /var/log/auth.log
+maxretry = 5
+[ssh-iptables]
+enabled = false
+filter = sshd
+action = ufw[application=OpenSSH, port=ssh, protocol=tcp]
+#sendmail-whois[name=SSH, dest=infra@grouplease.co.th, sender=admin@grouplease.international]
+logpath = /var/log/auth.log
+maxretry = 5 
+[zimbra-account]
+enabled = true
+filter = zimbra
+action = ufw-allport[application=zimbra-account]
+#sendmail[name=zimbra-account, dest=infra@grouplease.co.th]
+logpath = /opt/zimbra/log/mailbox.log
+bantime = 60000
+maxretry = 5
+[zimbra-audit]
+enabled = true
+filter = zimbra
+action = ufw-allport[application=zimbra-audit]
+#sendmail[name=Zimbra-audit, dest=infra@grouplease.co.th]
+logpath = /opt/zimbra/log/audit.log
+bantime = 60000
+maxretry = 3
+[zimbra-recipient]
+enabled = true
+filter = zimbra
+action = ufw-allport[application=zimbra-recipient]
+#sendmail[name=Zimbra-recipient, dest=infra@grouplease.co.th]
+logpath = /var/log/zimbra.log
+#findtime = 604800
+bantime = 17280
+maxretry = 3
+[postfix]
+enabled = true
+filter = postfix
+action = ufw[application="postfix", blocktype=drop]
+#action = ufw[name=postfix, port=smtp, protocol=tcp]
+#sendmail-buffered[name=Postfix, dest=infra@grouplease.co.th]
+logpath = /var/log/zimbra.log
+bantime = -1
+maxretry = 3
+
+[postfix-sasl]
+enabled = true
+port = smtp,ssmtp,imap2,imap3,imaps,pop3,pop3s
+filter = postfix-sasl
+action =  ufw[application="postfix-sasl", blocktype=drop]
+#sendmail-buffered[name=Postfix, dest=infra@grouplease.co.th]
+# You might consider monitoring /var/log/warn.log instead
+# if you are running postfix. See http://bugs.debian.org/507990
+logpath = /var/log/zimbra.log
+bantime = -1
+maxretry = 3

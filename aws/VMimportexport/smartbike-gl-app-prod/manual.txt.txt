@@ -1,0 +1,1 @@
+aws ec2 import-image --description "smartbike-gl-app-prod" --disk-containers "file://D:\repository\ansiblelinuxaccount\aws\VMimportexport\smartbike-gl-app-prod\containers.json"

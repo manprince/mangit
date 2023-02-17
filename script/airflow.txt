@@ -1,0 +1,98 @@
+jdbc:interbase://172.255.152.2/d:/GLDATAN/Data/GLCONNECT.GDB
+Driver: inverclient.jar Class: Interbase.interclient.Driver
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+class JDBCTest {
+    private static final String url = "jdbc:interbase://172.255.152.2/d:/GLDATAN/Data/GLCONNECT.GDB";
+    private static final String user = "glhp";
+    private static final String password = "glhp";
+    public static void main(String args[]) {
+        try {
+Class.forName(“Interbase.interclient.Driver”);
+            Connection con = DriverManager.getConnection(url, user, password);
+            System.out.println("Success");
+        } catch (Exception e) {
+            e.printStackTrace();
+       }
+    }
+}
+
+install airflow 
+sudo apt install python3-pip
+sudo apt-get install python-dev python3-dev default-libmysqlclient-dev libpq-dev -y
+pip3 install apache-airflow
+pip3 install apache-airflow
+pip3 install psycopg2 boto3 paramiko sshtunnel awscli ldap3 psutil
+pip install psycopg2 boto3 paramiko sshtunnel awscli ldap3 psutil
+pip3 install apache-airflow
+
+rabbitmq
+curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add -
+sudo apt-key adv --keyserver "hkps.pool.sks-keyservers.net" --recv-keys "0x6B73A36E6026DFCA"
+sudo apt-get install apt-transport-https
+sudo apt install rabbitmq-server -t
+sudo systemctl enable rabbitmq-server
+sudo systemctl start rabbitmq-server
+sudo rabbitmqctl add_user admin admin
+sudo rabbitmqctl set_user_tags admin administrator
+sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+sudo rabbitmq-plugins enable rabbitmq_management
+
+curl -s -i -u guest:guest http://host:port/api/queues/vhost/queue_name | sed 's/,/\n/g' | grep '"messages"' | sed 's/"messages"://g'
+curl -u admin:admin http://172.255.152.151:15672/api/queues | sed 's/,/\n/g' | grep '"messages"\:'
+
+
+
+
+
+pip3 install psycopg2 boto3 paramiko sshtunnel awscli ldap3 psutil
+pip install psutil
+pip3 instalcd l sshtunnel
+pip install psycopg2 boto3 paramiko sshtunnel awscli ldap3
+pip3 install 'apache-airflow[celery]'
+pip3 install flower pandas
+
+java -cp ~/interbase.jar:Interbase.interclient.Driver -user glhp -password glhp -driver inverclient.jar -cstring jdbc:interbase://172.255.152.2/d:/GLDATAN/Data/GLCONNECT.GDB -c \;
+
+pip3 install --upgrade pip
+
+ps -ef | grep 'webserver' | grep -v grep | awk '{print $2}' | sudo xargs -r kill -9
+sudo rm ~/airflow/airflow-webserver.pid
+sudo rm ~/airflow/airflow-webserver-monitor.pid
+ps -ef | grep 'scheduler' | grep -v grep | awk '{print $2}' | xargs -r kill -9
+rm ~/airflow/airflow-scheduler.pid
+ps -ef | grep 'celeryd' | grep -v grep | awk '{print $2}' | xargs -r kill -9
+rm ~/airflow/airflow-worker.pid
+ps -ef | grep 'flower' | grep -v grep | awk '{print $2}' | xargs -r kill -9
+rm ~/airflow/airflow-flower.pid
+
+airflow webserver -p 8080 -D
+airflow scheduler -D
+
+sudo airflow webserver -p 80 -D
+airflow scheduler -D
+airflow flower -D
+airflow worker -D
+
+tail -f ~/airflow/airflow-webserver.err
+
+tail -f airflow-webserver.err
+airflow scheduler -D
+tail airflow-flower.err
+tail airflow-worker.err
+
+airflow worker -D
+
+postgresql+psycopg2://airflow:airflow@172.255.152.150:5432/airflow
+
+broker_url = amqp://admin:admin@172.255.152.150:15672/
+result_backend = postgresql+psycopg2://airflow:airflow@172.255.152.150:5432/airflow
+
+
+pip3 freeze | xargs pip3 uninstall -y
+
+
+curl -i -u admin:admin -H "content-type:application/json" \
+    -XPUT -d'{"type":"direct","durable":true}' \
+    http://172.255.152.150:15672/api/exchanges/%2f/airflow

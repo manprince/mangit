@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v2.2
+   # command: --providers.docker
+    command:
+      - "--log.level=DEBUG"
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--global.sendAnonymousUsage=false"
+      - --providers.docker
+      # This example uses "global authentication"
+      - --entryPoints.http.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.http.http.middlewares=traefik-forward-auth
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  traefik-forward-auth:
+    image: funkypenguin/traefik-forward-auth
+    environment:
+      - CLIENT_ID=secure-finwiz
+      - CLIENT_SECRET=c5e2a851-67a1-4885-9124-955b34ace7b7
+      - OIDC_ISSUER=https://auth.grouplease.co.th/auth/realms/it
+      - SECRET=83eb3d24a9068accb4094b333351b36b
+      - AUTH_HOST=auth.grouplease.co.th
+      - COOKIE_DOMAIN=grouplease.co.th
+
+    labels:
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
+
+  whoami:
+    image: containous/whoami
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`secure-finwiz.grouplease.co.th`)"
+      - "traefik.http.routers.whoami.middlewares=traefik-forward-auth"

@@ -1,0 +1,525 @@
+version: '3.7'
+services:
+    traefik:
+        image: traefik:alpine
+        ports:
+          - 80:80
+          - 443:443
+          - 8080:8080
+        volumes:
+          - taerifk:/etc/traefik
+          - /var/run/docker.sock:/var/run/docker.sock
+        networks: 
+          - local          
+    cm-axonserver:
+        image: "axoniq/axonserver"
+        ports:
+          - "8024:8024"
+          - "8124:8124"
+        environment:
+          - TZ=${TZ}
+        restart: unless-stopped
+        networks: 
+          - local
+        volumes:
+          - cm_axonserver_data:/data
+          - cm_axonserver_event_data:/eventdata
+        logging:
+          options:
+            awslogs-stream: cm-axonserver
+        tty: true  
+
+    minio:
+        image: minio/minio
+        ports:
+            - "9000:9000"
+        networks:
+            - local
+        restart: always
+        environment:
+            TZ: ${TZ}
+            MINIO_ACCESS_KEY: csfminio
+            MINIO_SECRET_KEY: csfminio
+        volumes:
+            - minio_data:/data
+            - ./minio_config:/root/.minio
+        command: server /data
+        logging:
+          options:
+            awslogs-stream: minio
+        tty: true
+    parameter:
+        image: ${DOCKER_REGISTRY}csf/parameter:${PARAMETER_VERSION:?err}
+        ports:
+            - "8080:8080"
+        networks:
+            - local
+        restart: always
+        environment:
+            - TZ=${TZ} 
+            - SPRING_PROFILES_ACTIVE=docker
+            - SERVER_SERVLET_CONTEXT_PATH=/parameters/
+            - KCLOAK_AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL:?err}
+            - KCLOAK_ALL_BRANCHES=${PARAMETER_KEYCLOAK_ALL_BRANCHES_POLICY_ID:?err}
+            - SWAGGER_SERVER_URL=${PUBLIC_BASE_URL:?err}/parameters
+            - KCLOAK_ADMIN_PASSWORD=${PARAMETER_KEYCLOAK_ADMIN_PASSWORD:?err}
+            - KCLOAK_ALL_POS_AND_DEALER_POLICY=${PARAMETER_KEYCLOAK_ALL_POS_AND_DEALER_POLICY:?err}
+            - KCLOAK_CLIENT_SECRET=${PARAMETER_KEYCLOAK_CREDENTIALS_SECRET:?err}
+            - KCLOAK_CLIENT_UUID=${PARAMETER_KEYCLOAK_CLIENT_ID:?err}
+            - PAYMENT_MANAGEMENT_SERVER_URL=http://payment-management:8080/pm
+        depends_on:
+            - parameter_db
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.rule=Host:mps.gl-ammk.com.mm
+            - traefik.docker.network=local   
+            - traefik.http.routers.whoami.rule=Host(`mps.gl-ammk.com.mm`) && Path(`/parameter`)
+        logging:
+          options:
+            awslogs-stream: parameter
+        tty: true
+    parameter_db:
+        image: postgres
+        networks:
+            - local
+        restart: always
+        ports:
+            - "5432:5432"
+        environment:
+            - TZ=${TZ}
+            - POSTGRES_USER=csf
+            - POSTGRES_PASSWORD=csf
+            - POSTGRES_DB=parameter
+        volumes:
+            - parameter_postgresql:/var/lib/postgresql
+            - parameter_postgresql_data:/var/lib/postgresql/data
+            - parameter_postgresql_backups:/backups
+        logging:
+          options:
+            awslogs-stream: parameter-postgres
+        tty: true
+
+    underwriting:
+        image: ${DOCKER_REGISTRY}csf/underwriting-web:${UW_VERSION}
+        ports:
+            - "8083:8080"
+        networks:
+            - local
+        restart: always
+        environment:
+            - TZ=${TZ}
+            - SPRING_PROFILES_ACTIVE=docker
+            - PARAMETER_SERVER_URL=http://parameter:8080/parameters
+            - SERVER_SERVLET_CONTEXT_PATH=/underwriting/
+            - KEYCLOAK_CREDENTIALS_secret=${UW_KEYCLOAK_CREDENTIALS_SECRET:?err}
+            - KEYCLOAK_AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL:?err}
+            - SWAGGER_SERVER_URL=${PUBLIC_BASE_URL:?err}/underwriting
+            - AXON_AXONSERVER_SERVERS=underwriting-axonserver
+            - SAVING_SERVICE_SERVER_URL=${PUBLIC_BASE_URL:?err}/savings-api/v1
+            - MINIO_ENDPOINT=${MINIO_ENDPOINT:?err}
+            - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:?err}
+            - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:?err}
+            - MINIO_REGION=${MINIO_REGION:?err}
+            - MINIO_ROOT_BUCKET_NAME=${MINIO_ROOT_BUCKET_NAME:?err}
+        depends_on:
+            - underwriting_db
+            - underwriting-axonserver
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.rule=Host:mps.gl-ammk.com.mm
+            - traefik.docker.network=local   
+            - traefik.http.routers.whoami.rule=Host(`mps-test.gl-ammk.com.mm`) && Path(`/underwriting`)            
+        logging:
+          options:
+            awslogs-stream: underwriting
+        tty: true
+    underwriting_db:
+        image: postgres
+        ports:
+            - "5433:5432"
+        networks:
+            - local
+        restart: always
+        environment:
+            - TZ=${TZ}
+            - POSTGRES_USER=csf
+            - POSTGRES_PASSWORD=csf
+            - POSTGRES_DB=underwriting
+        volumes:
+            - underwriting_postgresql:/var/lib/postgresql
+            - underwriting_postgresql_data:/var/lib/postgresql/data
+            - underwriting_postgresql_backups:/backups
+        logging:
+          options:
+            awslogs-stream: underwriting-postgres
+        tty: true
+
+    contract-management:
+        image: ${DOCKER_REGISTRY}csf/contract-management-web:${CM_VERSION:?err}
+        ports:
+            - "8084:8080"
+        networks:
+            - local
+        restart: always
+        environment:
+            - TZ=${TZ}
+            - SERVER_SERVLET_CONTEXT_PATH=/cm/
+            - SPRING_PROFILES_ACTIVE=docker,MPS
+            - PARAMETER_SERVER_URL=http://parameter:8080/parameters
+            - KEYCLOAK_AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL:?err}
+            - KEYCLOAK_CREDENTIALS_secret=${CM_KEYCLOAK_CREDENTIALS_SECRET:?err}
+            - AXON_AXONSERVER_SERVERS=cm-axonserver
+            - CSF_CM_AVAILABLE_LOAN_PRODUCTS_SME=false
+            - MPS_CM_AUTOACTIVATION_ENABLED=false
+            - SWAGGER_SERVER_URL=${PUBLIC_BASE_URL}/cm
+            - MINIO_ENDPOINT=${MINIO_ENDPOINT:?err}
+            - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:?err}
+            - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:?err}
+            - MINIO_REGION=${MINIO_REGION:?err}
+            - MINIO_ROOT_BUCKET_NAME=${MINIO_ROOT_BUCKET_NAME:?err}
+        tty: true
+        logging:
+          options:
+            awslogs-stream: contract-management
+        depends_on:
+            - contract_management_db
+            - cm-axonserver
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.rule=Host:mps.gl-ammk.com.mm
+            - traefik.docker.network=local   
+            - traefik.http.routers.whoami.rule=Host(`mps-test.gl-ammk.com.mm`) && Path(`/cm`)                
+    contract_management_db:
+        image: postgres
+        networks:
+            - local
+        restart: always
+        ports:
+            - "5434:5432"
+        environment:
+            - TZ=${TZ}
+            - POSTGRES_USER=csf
+            - POSTGRES_PASSWORD=csf
+            - POSTGRES_DB=contract_management
+        volumes:
+            - contract_management_postgresql:/var/lib/postgresql
+            - contract_management_postgresql_data:/var/lib/postgresql/data
+            - contract_management_postgresql_backups:/backups
+        command: ["-c","allow_system_table_mods=true"]
+        logging:
+          options:
+            awslogs-stream: contract-management-postgres
+        tty: true
+ 
+
+    payment-management:
+        image: ${DOCKER_REGISTRY}csf/payment-management-web:${PM_VERSION}
+        ports:
+            - "8085:8080"
+        networks:
+            - local
+        restart: always
+        environment:
+            - TZ=${TZ}
+            - IS_BGMM_INSTANCE_ENVIRONMENT=true
+            - AXON_AXONSERVER_SERVERS=payment-management-axonserver
+            - SPRING_PROFILES_ACTIVE=docker
+            - SERVER_SERVLET_CONTEXT_PATH=/pm/
+            - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+            - MPS_AUTOREPAYMENT_ENABLED=false
+            - SWAGGER_SERVER_URL=${PUBLIC_BASE_URL:?err}/pm
+            - PARAMETER_SERVER_URL=http://parameter:8080/parameters
+            - KEYCLOAK_AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL:?err}
+            - KEYCLOAK_CREDENTIALS_secret=${PM_KEYCLOAK_CREDENTIALS_SECRET:?err}
+            - JAVA_TOOL_OPTIONS=-Dcsf.pm.available.loan.products.mps=true -Dmps.autorepayment.enabled=false
+            - MINIO_ENDPOINT=${MINIO_ENDPOINT:?err}
+            - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:?err}
+            - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:?err}
+            - MINIO_REGION=${MINIO_REGION:?err}
+            - MINIO_ROOT_BUCKET_NAME=${MINIO_ROOT_BUCKET_NAME:?err}
+        logging:
+          options:
+            awslogs-stream: payment-management
+        depends_on:
+            - payment_management_db
+        tty: true
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.rule=Host:mps.gl-ammk.com.mm
+            - traefik.docker.network=local   
+            - traefik.http.routers.whoami.rule=Host(`mps.gl-ammk.com.mm`) && Path(`/pm`) 
+    payment_management_db:
+        image: postgres
+        networks:
+            - local
+        restart: always
+        ports:
+            - "5435:5432"
+        environment:
+            - TZ=${TZ}
+            - POSTGRES_USER=csf
+            - POSTGRES_PASSWORD=csf
+            - POSTGRES_DB=payment_management
+        volumes:
+            - payment_management_postgresql:/var/lib/postgresql
+            - payment_management_postgresql_data:/var/lib/postgresql/data
+            - payment_management_postgresql_backups:/backups
+        logging:
+          options:
+            awslogs-stream: payment-management-postgres
+        tty: true
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+             - "5672:5672"
+             - "15672:15672"
+        environment:
+            - TZ=${TZ}
+        restart: always
+        networks:
+            - local
+        tty: true
+        logging:
+          options:
+            awslogs-stream: rabbitmq
+        tty: true
+
+    keycloak:
+        image: quay.io/keycloak/keycloak:12.0.1
+        networks:
+            - local
+        restart: always
+        depends_on:
+            - keycloak_db
+        environment:
+           PROXY_ADDRESS_FORWARDING: 'true'
+           KEYCLOAK_USER: admin
+           KEYCLOAK_PASSWORD: admin
+           #KEYCLOAK_IMPORT: /tmp/realm-export.json -Dkeycloak.profile.feature.upload_scripts=enabled
+           DB_ADDR: keycloak_db
+           DB_USER: keycloak
+           DB_VENDOR: postgres
+           DB_PASSWORD: keycloak
+           TZ: ${TZ}
+           JAVA_TOOL_OPTIONS: -Dkeycloak.profile.feature.upload_scripts=enabled
+        ports:
+           - "8888:8080"
+           - "9990:9990"
+        logging:
+          options:
+            awslogs-stream: keycloak
+        tty: true
+        #volumes:
+        #   - ./realm-export.json:/tmp/realm-export.json
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.rule=Host:mps.gl-ammk.com.mm
+            - traefik.docker.network=local   
+            - traefik.http.routers.whoami.rule=Host(`mps.gl-ammk.com.mm`) && Path(`/auth`)
+    keycloak_db:
+        image: postgres
+        networks:
+            - local
+        restart: always
+        environment:
+            - TZ=${TZ}
+            - POSTGRES_USER=keycloak
+            - POSTGRES_PASSWORD=keycloak
+            - POSTGRES_DB=keycloak
+        volumes:
+            - keycloak_postgresql:/var/lib/postgresql
+            - keycloak__postgresql_data:/var/lib/postgresql/data
+            - keycloak_postgresql_backups:/backups
+        logging:
+          options:
+            awslogs-stream: keycloak-postgres
+        tty: true
+ 
+
+    savings-db:
+        image: mongo:4.0.11
+        restart: unless-stopped
+
+        networks:
+            - local
+        environment:
+            TZ: ${TZ}
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: admin
+            MONGO_INITDB_DATABASE: savings
+            MONGO_SAVINGDB_USERNAME: savings
+            MONGO_SAVINGDB_PASSWORD: savings
+        ports:
+            - "27017:27017"
+        volumes:
+            - savings_data:/data/db
+            - savings_db_backups:/backups
+            - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+        logging:
+          options:
+            awslogs-stream: savings-mongodb
+        tty: true
+
+
+    savings-axonserver:
+         image: axoniq/axonserver
+         networks:
+            - local
+         ports:
+            - "8026:8024"
+            - "8126:8124"
+         environment:
+            - TZ=${TZ}
+         restart: unless-stopped
+         tty: true
+         volumes:
+            - savings_axonserver_data:/data
+            - savings_axonserver_event_data:/eventdata
+         logging:
+          options:
+            awslogs-stream: savings-axonserver
+ 
+    
+    savings-client:
+         image: ${DOCKER_REGISTRY}mps/savings-client:${SAVINGS_CLIENT_VERSION:?err}
+         restart: unless-stopped
+         ports: 
+            - "80:80"
+         tty: true
+         environment:
+            - TZ=${TZ} 
+            - KEYCLOAK_URL=${KEYCLOAK_AUTH_SERVER_URL:?err}
+            - KEYCLOAK_REALM=CSF
+            - KEYCLOAK_CLIENT_ID=mps-savings-client
+            - SAVINGS_API_URL=${PUBLIC_BASE_URL:?err}/savings-api/v1
+         logging:
+          options:
+            awslogs-stream: savings-client
+    
+    savings-service:
+         image: ${DOCKER_REGISTRY}mps/savings-service:${SAVINGS_SERVICE_VERSION:?err}
+         restart: unless-stopped
+         depends_on:
+            - savings-axonserver
+            - savings-db
+         networks:
+            - local
+         ports: 
+            - "8086:8080"
+         tty: true
+         environment:
+            - TZ=${TZ}
+            - SERVER_SERVLET_CONTEXT_PATH=/savings-api
+            - KEYCLOAK_AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL:?err}
+            - SPRING_RABBITMQ_HOST=rabbitmq
+            - SPRING_DATA_MONGODB_HOST=savings-db
+            - AXON_AXONSERVER_SERVERS=savings-axonserver
+            - SWAGGER_SERVER_URL=${PUBLIC_BASE_URL:?err}/savings-api
+         logging:
+            options:
+              awslogs-stream: savings-service
+    
+    underwriting-axonserver:
+         image: "axoniq/axonserver"
+         ports:
+            - "8023:8024"
+         environment:
+            - TZ=${TZ}
+         restart: unless-stopped
+         tty: true
+         networks:
+           - local
+         volumes:
+           - underwriting_axonserver_data:/data
+           - underwriting_axonserver_event_data:/eventdata
+         logging:
+          options:
+            awslogs-stream: underwriting-axonserver
+    
+    payment-management-axonserver:
+         image: "axoniq/axonserver"
+         ports:
+            - "8025:8024"
+            - "8125:8124"
+         environment:
+            - TZ=Asia/Bangkok
+         restart: unless-stopped
+         tty: true
+         networks:
+           - local
+         volumes:
+           - payment_management_axonserver_data:/data
+           - payment_management_axonserver_event_data:/eventdata
+         logging:
+          options:
+            awslogs-stream: payment-management-axonserver
+
+
+networks:
+    local:
+volumes:
+    taerifk:
+      driver: local
+      driver_opts:
+        device: ${PWD}/taerifk/data
+        o: bind
+        type: none
+    minio_data:
+    parameter_postgresql:
+    parameter_postgresql_data:
+    underwriting_postgresql:
+    underwriting_postgresql_data:
+    contract_management_postgresql:
+    contract_management_postgresql_data:
+    keycloak_postgresql:
+    keycloak__postgresql_data:
+    keycloak_postgresql_backups:
+      driver: local
+      driver_opts:
+        device: ${PWD}/keycloak-db/backups
+        o: bind
+        type: none
+    contract_management_postgresql:
+    contract_management_postgresql_data:
+    contract_management_postgresql_backups:
+      driver: local
+      driver_opts:
+        device: ${PWD}/cm-db/backups
+        o: bind
+        type: none
+    payment_management_postgresql_backups:
+      driver: local
+      driver_opts:
+        device: ${PWD}/pm-db/backups
+        o: bind
+        type: none
+    payment_management_postgresql:
+    payment_management_postgresql_data:
+    payment_management_axonserver_data:
+    payment_management_axonserver_event_data:
+    cm_axonserver_data:
+    cm_axonserver_event_data:
+    savings_data:
+    savings_axonserver_data:
+    savings_axonserver_event_data:
+    savings_db_backups:
+      driver: local
+      driver_opts:
+        device: ${PWD}/savings-db/backups
+        o: bind
+        type: none
+    parameter_postgresql_backups:
+      driver: local
+      driver_opts:
+        device: ${PWD}/parameter-db/backups
+        o: bind
+        type: none
+    underwriting_axonserver_data:
+    underwriting_axonserver_event_data:
+    underwriting_postgresql_backups:
+      driver: local
+      driver_opts:
+        device: ${PWD}/uw-db/backups
+        o: bind
+        type: none    

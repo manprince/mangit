@@ -1,0 +1,10 @@
+[
+  {
+    "Description": "Smartbike-GL-App-Prod",
+    "Format": "ova",
+    "UserBucket": {
+        "S3Bucket": "vcenterbackup",
+        "S3Key": "vms/Smartbike-GL-App-Prod.ova"
+    }
+}
+]

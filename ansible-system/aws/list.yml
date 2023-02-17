@@ -1,0 +1,9 @@
+---
+module:
+  - username: thanapon
+    passwd: "$6$w2mA9NADeHuaze$6BmqCsD.Q6cUFotlxBkt2UUDCYWx86AisIuGpFYxv76QXDA2fkwyRCIBRgaaGeaz8nfJW.Zrvh3wz7VoZAW/41"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/bin/bash"
+    mail: "thanapon_s@grouplease.co.th"
+    quit: no

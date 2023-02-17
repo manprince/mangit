@@ -1,0 +1,81 @@
+version: "3"
+
+services:
+  traefik:
+    image: "traefik:v2.0"
+    container_name: "traefik"
+    command:
+      # Globals
+      - "--log.level=DEBUG"
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--global.sendAnonymousUsage=false"
+      # Docker
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      # Entrypoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # LetsEncrypt
+      # - "--certificatesresolvers.mydnschallenge.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.mydnschallenge.acme.email=infra@grouplease.co.th"
+      - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.mydnschallenge.acme.storage=/etc/traefik/acme.json"
+    ports:
+      - "880:80"
+      - "8443:443"
+      - "8081:8080"
+    environment:
+      #- CF_API_EMAIL=${CF_API_EMAIL}
+      #- CF_API_KEY=${CF_API_KEY}
+      - CF_DNS_API_TOKEN=${TOKEN}
+    volumes:
+      - "/opt/traefik:/etc/traefik" #use to store certificatejson
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      # API
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.tnbcarbuy.com`)"
+#      - 'traefik.http.routers.traefik.entrypoints=websecure'
+      - 'traefik.http.routers.traefik.service=api@internal'      
+#      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+#      - "traefik.http.services.traefik.loadbalancer.server.scheme=http"
+      # Wildcard cert
+      - "traefik.http.routers.traefik.tls.domains[0].main=tnbcarbuy.com"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.tnbcarbuy.com"
+      - "traefik.http.routers.traefik.tls.certresolver=mydnschallenge"
+      # Global http-->https
+ #     - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:[a-z-.]+}`)"
+ #     - "traefik.http.routers.http-catchall.entrypoints=web"
+ #     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+ #     - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    restart: always
+  cloudflare-companion:
+    image: tiredofit/traefik-cloudflare-companion
+    container_name: cloudflare-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TRAEFIK_VERSION=2
+#      - CF_EMAIL=infra@grouplease.co.th
+      - CF_TOKEN=${TOKEN}
+
+      - TARGET_DOMAIN=${hostfulladdress}
+      - DOMAIN1=${domain}
+      - DOMAIN1_ZONE_ID=${CF_ZONE_ID}
+      #- DOCKER_HOST=tcp://198.51.100.32:2376
+      #- DOCKER_CERT_PATH=/docker-certs
+      #- DOCKER_TLS_VERIFY=1
+
+    restart: always
+  whoami:
+    image: "containous/whoami"
+    container_name: "whoami"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.tnbcarbuy.com`) && Path(`/whoami`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=mydnschallenge"
+    restart: always

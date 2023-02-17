@@ -1,0 +1,26 @@
+---
+- hosts: nonprod
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+  
+  tasks:
+    # This task updates our CentOS based systems
+    - name: .rpm upgrade server
+      yum: >
+        update_cache=yes
+        name=*
+        state=latest
+        update_cache=yes
+      when: >
+        ansible_distribution == 'CentOS'
+ 
+    # This task updates our Ubuntu based systems
+    - name: .deb do dist-upgrade
+      apt: >
+        update_cache=yes
+        cache_valid_time=1200
+        upgrade=yes
+      when: >
+        ansible_distribution == 'Ubuntu'

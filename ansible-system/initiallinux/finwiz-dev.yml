@@ -1,0 +1,22 @@
+---
+users:
+  - username: woottipong
+    passwd: "$6$WCFu7I3x1OINZErx$dgBxHdD63uG5y8I3YEsKnSyxPwc6A27klf0iDPQGzhGJSajehpjqdN2DlgXd38J5IHykuoftl3icffc99ouxV."
+    use_sudo: yes
+    expire: "1672419600"
+    shell: "/bin/bash"
+    mail: "woottipong.@grouplease.co.th"
+    quit: no
+    key: yes
+  - username: seksan
+    passwd: "$6$LPo/egr73LPUg1p$9CFG7yS.GGkfggz68tjPs/Xg6EsUNMfXCcWmPFLWWQZHEELa5BfbnBZsuqkbCChRGqEeGjiXM8ytlnP9/5jMS/"
+    use_sudo: yes
+    expire: "1672419600"
+    shell: "/bin/bash"
+    mail: "seksan.p@grouplease.co.th"
+    quit: no
+    key: no
+#creat password by use command
+#'mkpasswd --method=SHA-512'
+#date -d '12/31/2022 00:00:00' +"%s"
+#for disable user	/sbin/nologin

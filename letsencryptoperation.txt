@@ -1,0 +1,9 @@
+generate cert wildcard
+sudo ./certbot-auto certonly --manual --preferred-challenges=dns --email infra@grouplease.co.th --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d *.grouplease.co.th
+
+renew
+certbot renew --text >> /etc/letsencrypt/logs/renew.txt
+
+Generatepassword for keyfile
+openssl rsa -aes192 -in yourprivatekeywithoutpassword.pem -out newprivatekeywithpassword.pem
+1

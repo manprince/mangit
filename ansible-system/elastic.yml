@@ -1,0 +1,78 @@
+---
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+#Ubuntu  
+
+    - name: Ubuntu Add beat key    
+      apt_key:
+        key: D88E42B4
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+      when:
+        ansible_distribution == 'Ubuntu'
+    - name: Ubuntu Add beat repositories
+      apt_repository:
+        repo: "{{ item }}"
+        state: present
+      with_items:
+        - "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+      when:
+        ansible_distribution == 'Ubuntu'        
+    - name: Ubuntu .deb do dist-upgrade
+      apt: 
+        update_cache: yes
+        cache_valid_time: 1200
+        upgrade: no
+      when: 
+        ansible_distribution == 'Ubuntu'
+    - name: Ubuntu Install filebeat and prerequisites
+      apt:
+        update_cache: yes
+        pkg: ['filebeat', 'apt-transport-https']
+        state: latest
+      # with_items:
+      #   - filebeat
+      #   - apt-transport-https
+      when: 
+        ansible_distribution == 'Ubuntu'  
+#centos        
+    - name: Centos Add elastic repositories
+      yum_repository:
+        name: elastic
+        description: elastic Distribution Neutral
+        baseurl: https://artifacts.elastic.co/packages/7.x/yum
+        enabled: yes
+      when:
+        ansible_distribution == 'CentOS'
+    - name: Centos Add beat gpgkey
+      rpm_key:
+        state: present
+        key: https://packages.elastic.co/GPG-KEY-elasticsearch
+      when:
+        ansible_distribution == 'CentOS'
+    - name: Centos install the latest version of filebeat
+      yum:
+        name: filebeat
+        state: latest
+      when:
+        ansible_distribution == 'CentOS'        
+#service        
+    - name: copy filebeat configuration
+      copy:
+        src: confelk/filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        mode: 0644
+    - name: copy module configuration
+      copy:
+        src: confelk/modules.d/
+        dest: /etc/filebeat//modules.d/
+        mode: 0644        
+    - name: Restart service filebeat, in all cases
+      service:
+        name: filebeat
+        state: restarted

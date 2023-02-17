@@ -1,0 +1,24 @@
+---
+users:
+  - username: t.bunsath
+    passwd: "$6$NJtl3nyW$KH1W4mAesfY4tBWSFpXAUhmEhdnBMj/YbrKg02W56.6iHC1NjOvyX9Sl8kmRrgCLELRN4rO/mpxtvdA3lKdr4/"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/bin/bash"
+    mail: "b.tha.gl-f.com"
+    quit: no
+    #T21Buns@th
+  - username: e.socheat
+    passwd: "
+$6$9lezhsZsyio$PRU/Pmq0WlJ/E7ElB4H1zUvXM32Kk6RjhqF7NdOHORAl11eQPnIWBOQq4tn6/yredDzecogE748PiBpMXw7LN0"
+    use_sudo: yes
+    expire: "2213114399"
+    shell: "/bin/bash"
+    mail: "s.eam.gl-f.com"
+    quit: no
+    #
+
+#creat password by use command
+#'mkpasswd --method=SHA-512'
+#date -d '12/31/2022 00:00:00' +"%s"
+#for disable user	/sbin/nologin

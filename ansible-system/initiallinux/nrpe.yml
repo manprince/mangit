@@ -1,0 +1,106 @@
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+
+
+# Example removing a repository and cleaning up metadata cache
+    - name: Remove repository (and clean up left-over metadata)
+      yum_repository:
+        name: rpmforge
+        state: absent
+      when:
+        ansible_distribution == 'CentOS'          
+    - name: C:install epel
+      yum:
+        name: epel-release
+        state: latest
+      when:
+        ansible_distribution == 'CentOS'
+    - name: import epel key
+      rpm_key:
+        state: present
+        key: http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+      when:
+        ansible_distribution == 'CentOS'
+    - name: C:install nrpe
+      yum:
+        name: ['nagios-plugins-all','nrpe','xinetd','net-tools']
+        state: latest
+      when:
+        ansible_distribution == 'CentOS'
+ 
+    - name: U:install nagios plugins 18.04
+      apt:
+        name: ['nagios-nrpe-server','nagios-plugins','xinetd']
+        state: latest
+      when:
+        - ansible_distribution == 'Ubuntu'
+        - ansible_distribution_version == '18.04'   
+    - name: U:install nagios plugins 20.04
+      apt:
+        name: ['nagios-nrpe-server','nagios-plugins', 'xinetd']
+        state: latest
+      when:
+        - ansible_distribution == 'Ubuntu'
+        - ansible_distribution_version == '20.04'   
+    - name: deploy nrpe.cfg centos
+      copy:
+        src: nrpe/nrpe.cfg
+        dest: /etc/nagios/nrpe.cfg
+      when:
+        - ansible_distribution == 'CentOS'
+    - name: deploy nrpe.cfg ubuntu
+      copy:
+        src: nrpe/nrpeubuntu.cfg
+        dest: /etc/nagios/nrpe.cfg    
+      when:
+        - ansible_distribution == 'Ubuntu'
+    
+      # register: deploy_nrpe
+    - name: deploy xinetd
+      copy:
+        src: nrpe/nrpe
+        dest: /etc/xinetd.d/nrpe
+      # register: deploy_xinetd
+    - name: start/restart and enable nagios-nrpe-server
+      service:
+        name: nagios-nrpe-server
+        state: restarted
+        enabled: yes
+      when: 
+        # - deploy_nrpe.changed
+        - ansible_distribution == 'Ubuntu'
+    - name: start/restart and enable xinetd
+      service:
+        name: xinetd
+        state: restarted
+        enabled: yes
+      # when: 
+      #   - deploy_xinetd.changed        
+    - name: start/restart and enable nrpe
+      systemd:
+        name: nrpe
+        state: restarted
+        enabled: yes
+      when: 
+        # - deploy_nrpe.changed
+        - ansible_distribution == 'CentOS'    
+    - name: open port
+      firewalld:
+        zone: public
+        port: 5666/tcp
+        permanent: true
+        immediate: yes 
+        state: enabled
+      when:
+        - ansible_distribution == 'CentOS' 
+            
+    - name: Check service
+      shell: "netstat -npl |grep 5666"
+      register: versions
+    - debug: var=versions.stdout
+

@@ -1,0 +1,28 @@
+#KB https://wiki.zimbra.com/wiki/Improving_Anti-spam_system
+sudo nano /opt/zimbra/conf/salocal.cf.in 
+
+#restart service 
+zmamavisdctl restart
+zmamavisdctl restart &&\
+zmmtactl restart
+
+whitelist_from *.gl-f.com 
+
+header    LOCAL_RULE_GLF   Received =~ /\[203\.217\.171\.132\]/
+describe  LOCAL_RULE_GLF   Spam passed through possible spammer relay
+score     LOCAL_RULE_GLF   -2
+
+
+cat /var/log/zimbra.log |zgrep "r.ishigami@gl-f.com auth failed"
+cat /var/log/zimbra.log |zgrep "y.kozuma@gl-f.com auth failed"
+r.ishigami@gl-f.com auth failed
+
+52.147.24.103
+
+warning: unknown[52.147.24.103]: SASL LOGIN authentication failed: authentication failure 
+ 
+
+
+
+
+

@@ -1,0 +1,73 @@
+- hosts: all
+  gather_facts: yes
+  #strategy: free
+  become: yes
+
+  tasks:
+    #Ubuntu repo
+    - name: Ubuntu Add Webmin key2    
+      apt_key:
+        url: http://www.webmin.com/jcameron-key.asc
+        state: present
+      when: >
+        ansible_distribution == 'Ubuntu'
+    - name: Ubuntu Add Webmin repositories
+      apt_repository: >
+        repo='{{ item }}'
+        state=present
+      with_items:
+        - "deb http://download.webmin.com/download/repository sarge contrib"
+      when: >
+        ansible_distribution == 'Ubuntu'
+    - name: Ubuntu Add universe
+      apt_repository: >
+        repo='{{ item }}'
+        state=present
+      with_items:
+        - "deb http://archive.ubuntu.com/ubuntu bionic universe"
+      when: >
+        ansible_distribution == 'Ubuntu' and 
+          ansible_distribution_release == "bionic"   
+    - name: Ubuntu .deb do dist-upgrade
+      apt: 
+        update_cache: yes
+        cache_valid_time: 1200
+        upgrade: no
+      when: 
+        ansible_distribution == 'Ubuntu'              
+
+    - name: Ubuntu Install Webmin and prerequisites
+      apt:
+        update_cache: yes
+        pkg: ['webmin']
+        state: latest
+      when:
+        ansible_distribution == 'Ubuntu'
+    #Centos repo
+    - name: Centos epel
+      yum:
+        name: epel-release
+        state: latest
+      when: >
+        ansible_distribution == 'CentOS'
+    - name: Centos Add Webmin repositories
+      yum_repository:
+        name: Webmin
+        description: Webmin Distribution Neutral
+        baseurl: https://download.webmin.com/download/yum
+        mirrorlist: https://download.webmin.com/download/yum/mirrorlist
+        enabled: yes
+      when: >
+        ansible_distribution == 'CentOS'
+    - name: Centos Add Webmin gpgkey
+      rpm_key:
+        state: present
+        key: http://www.webmin.com/jcameron-key.asc
+      when: >
+        ansible_distribution == 'CentOS'
+    - name: Centos install the latest version of Webmin
+      yum:
+        name: webmin
+        state: latest
+      when: >
+        ansible_distribution == 'CentOS'

@@ -1,0 +1,30 @@
+---
+- hosts:  bgmm-web-prod
+  gather_facts: yes
+  strategy: free
+      #remote_user: root
+  become: yes
+    
+  tasks:
+    - name: Update apt cache
+      apt: update_cache=yes cache_valid_time=3600
+      when:
+        ansible_distribution == 'Ubuntu'  
+    - name: Install goaccess
+      apt: pkg=goaccess
+      when:
+        ansible_distribution == 'Ubuntu'  
+    - name: install package goaccess
+      yum:
+         name: goaccess
+         state: latest 
+      when:
+        ansible_distribution == 'CentOS'
+
+
+#sudo goaccess /var/log/apache2/accesswithcookie.log --log-format=COMBINED
+sudo goaccess /var/log/apache2/accesswithcookie.log --log-format=with_cookies
+
+sudo goaccess /var/log/apache2/accesswithcookie.log --log-format='%h [%d:%t %^] "%r" %s %b "%R" "%u" "%^"' --date-format=%d/%b/%Y --time-format=%T
+
+'%{IPORHOST:clientip} %{WORD:remote_log_name} %{WORD:user} \[%{HTTPDATE:timestamp}\] \"%{WORD:Method} %{DATA:request} HTTP/%{NUMBER:httpversion}\" %{NUMBER:response} %{NUMBER:Response_size} \"%{WORD:referrer}\" \"%{QUOTEDSTRING:agent}\" \"PHPSESSID=(?:%{WORD:cookies_PHPSESSID}|%{WORD:cookies_PHPSESSID}; %{WORD:cookies_userid})\"'

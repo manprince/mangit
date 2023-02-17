@@ -1,0 +1,126 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    aak: AKIAS4YCDWL76ECX6I7J
+    ask: di7PK8mtCLpxZc6KJWwYK0aUWfQYwysTmq2bck0H
+    cloudflare_token: q7nIzfyPQW746rsoxU2trWwai4YNIqFQ-iSjRp9A
+    entitycode: gl
+    environmentid: test-2
+    tag_project: test-gl
+    instance_type: t2.micro
+    security_group_id: sg-091c84cff6f8864f4
+    image: ami-0e2e44c03b85f58b3
+    subnet_id: subnet-d8454d91
+    region: ap-southeast-1
+  tasks:
+
+    - name: Create EC2 instance
+      amazon.aws.ec2:
+        key_name: glaws
+        aws_access_key: '{{ aak }}'
+        aws_secret_key: '{{ ask }}'
+        region: '{{ region }}'
+        group_id: '{{ security_group_id }}'
+        instance_type: '{{ instance_type }}'
+        image: '{{ image }}'
+        wait: yes
+        wait_timeout: 500
+        volumes:
+          - device_name: /dev/xvda
+            volume_type: gp3
+            volume_size: 10
+        vpc_subnet_id: '{{ subnet_id }}'
+        assign_public_ip: no
+        instance_tags:
+          Name: '{{ entitycode }}mps{{ environmentid }}'
+          Project: '{{ tag_project }}'
+      register: ec2
+    - name: Create Elastic IP for instance
+      community.aws.ec2_eip:
+        aws_access_key: '{{ aak }}'
+        aws_secret_key: '{{ ask }}'
+        region: '{{ region }}'
+        device_id: "{{ item }}"
+        in_vpc: true
+        tag_name: Project
+        tag_value: '{{ tag_project }}'
+        state: present
+      loop: "{{ ec2.instance_ids }}"
+      register: eip
+    # - name: output the IP
+    #   ansible.builtin.debug:
+    #     msg: "Allocated IP is {{ eip.public_ip }}"
+    #   loop: "{{ eip.allocation_id }}"
+    # - name: Create a record using api token
+    #   community.general.cloudflare_dns:
+    #     zone: tnbcarbuy.com
+    #     record: test
+    #     type: A
+    #     value: '{{ eip.public_ip }}'
+    #     api_token: '{{ cloudflare_token }}'
+        # - name: ec2 is
+    #   ansible.builtin.debug:
+    #     msg: "Allocated volume is {{ ec2.instances }}"         
+    # - name: List Volime ID from instance 
+    #   amazon.aws.ec2_vol:
+    #     aws_access_key: '{{ aak }}'
+    #     aws_secret_key: '{{ ask }}'
+    #     region: '{{ region }}'
+    #     instance: i-0411b5d91a190dcdc
+    #     #instance: '{{ volumes.attachment_set.instance_id }}'
+    #     #instance: '{{ item.id }}'
+    #     state: list
+    #   #loop: '{{ ec2.instances }}'
+    #   register: ec2_metadata 
+    # - name: Print out the volume ids
+    #   debug: msg= '{{ item.volume_id }}'
+    #   with_items: ec2_vol.results      
+    # - name: show volume   
+    #   amazon.aws.ec2_metadata_facts:
+    #    # aws_access_key: '{{ aak }}'
+    #   #  aws_secret_key: '{{ ask }}'
+    #    # region: '{{ region }}'
+    #  #   filters:
+    #  #     tag:Name": glmpstest-2      
+    #   #    tag:Name": '{{ entitycode }}mps{{ environmentid }}'
+    #   #loop: '{{ ec2.instances }}'  
+    #   register: ec2_metadata
+  #   - name: lookup ec2 virtual machines
+  #     ec2_instance_facts:
+  #       aws_access_key: "{{aak}}"
+  #       aws_secret_key: "{{ask}}"
+  #       region: "{{region}}"
+  #       filters:
+  #         instance-state-name: running
+  #         "tag:Name": glmpstest-2
+          
+  #     register: ec2_info   
+  # #  - debug: msg="{{ ec2_info.instances[0].block_device_mappings[0].ebs.volume_id }}"
+  #   - debug: msg="{{ item | map(attribute='volume_id') | list }}"
+  #     with_items: "{{ ec2_info.instances }}"
+  #     register: ec2_vol  
+  #   - name: Ensure tags are present on a resource
+  #     amazon.aws.ec2_tag:
+  #       aws_access_key: '{{ aak }}'
+  #       aws_secret_key: '{{ ask }}'
+  #       region: '{{ region }}'
+  #       resource: '{{ msg }}'
+  #       state: present
+  #       tags:
+  #         Name: '{{ entitycode }}mps{{ environmentid }}'
+  # #         Project: '{{ tag_project }}'
+  #     loop: '{{ ec2_vol }}'  
+    # - name: Create EBS Volume and attach to EC2   
+    #   amazon.aws.ec2_vol:
+    #     name: '{{ entitycode }}mps{{ environmentid }}'
+    #     instance: '{{ item.id }}'
+    #     device_name: /dev/sda1
+    #     volume_type: gp2
+    #     volume_size: 5
+    #     region: '{{ region }}'
+    #     tags:
+    #       Project: '{{ tag_project }}'
+    #   loop: '{{ ec2.instances }}'
+    #   register: ec2_vol     

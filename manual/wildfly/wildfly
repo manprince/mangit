@@ -1,0 +1,67 @@
+#!/bin/bash
+# By Oudam - Software Architecture
+# Skype: oudam.chea
+# Version 2 
+
+global () {
+wildfly_home="/opt/wildfly"
+start_script="$wildfly_home/bin/standalone.sh"
+log_file="/var/log/wildfly/wildfly.log"
+wildfly_user="wildfly"
+pid="$(ps aux | grep jboss | grep -v grep| awk '{print $2}')"
+pid_dir="/var/run/wildfly"
+pid_file="$pid_dir/wildfly.pid"
+}
+global
+
+
+case "$1" in 
+
+start)
+        if [ ! -d "$pid_dir" ]; then
+                mkdir $pid_dir
+                chown -R $wildfly_user: $pid_dir
+        fi
+
+        if [ $pid > /dev/null ]; then
+                echo "$(tput setaf 2)Wildfly is already running, pid: $pid $(tput sgr 0)"
+        else
+                echo "Starting service..."
+                su -c "$start_script &" -s /bin/sh wildfly &> $log_file
+                sleep 3
+                $(echo $pid) > $pid_file
+                /etc/init.d/wildfly status
+        fi
+   ;;
+
+stop)
+        if [ ! -d $pid > /dev/null ]; then
+                echo "Stopping service..."
+                kill -9 $pid
+                sleep 3
+                rm $pid_file
+                /etc/init.d/wildfly status
+        else
+                echo "$(tput setaf 1)Wildfly is NOT running$(tput sgr 0)"
+        fi
+   ;;
+
+restart)
+   /etc/init.d/wildfly stop
+   sleep 3
+   /etc/init.d/wildfly start
+   ;;
+
+status)
+   if [ -f $pid_file ]; then
+      echo "$(tput setaf 2)Wildfly is running, pid: $pid $(tput sgr 0)"
+   else
+      echo "$(tput setaf 1)Wildfly is NOT running$(tput sgr 0)"
+      exit 1
+   fi
+   ;;
+*)
+   echo "Usage: $0 {start|stop|status|restart}"
+esac
+
+exit 0 

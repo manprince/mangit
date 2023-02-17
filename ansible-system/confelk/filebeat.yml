@@ -1,0 +1,33 @@
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+filebeat.inputs:
+- type: docker
+  enabled: true
+  combine_partials: true
+  containers:
+    paths:
+      - /var/lib/docker/containers/*/*.log
+    ids:
+      - '*'
+  json.keys_under_root: true
+  json.add_error_key: true
+#  json.message_key: log
+  document_type: docker
+  processors:
+  - add_docker_metadata: ~
+  - decode_json_fields:
+      fields: ["log"]
+
+logging.metrics.enabled: false
+
+output.elasticsearch:
+  enabled: true
+  hosts: ["192.168.9.131:9200"]
+http.enabled: true
+http.host: 0.0.0.0
+http.port: 5066
+setup.template.settings:
+  index:
+    max_docvalue_fields_search: 200

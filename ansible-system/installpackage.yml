@@ -1,0 +1,21 @@
+---
+- hosts: all
+  gather_facts: yes
+ # strategy: free
+  #remote_user: root
+  become: yes
+
+  tasks:
+    - name: install package Ubuntu
+      apt:
+        name: open-vm-tools
+        state: latest 
+      when:
+        ansible_distribution == 'Ubuntu'
+    
+    - name: install package CentOS
+      yum:
+        name: open-vm-tools
+        state: latest 
+      when:
+        ansible_distribution == 'CentOS'
