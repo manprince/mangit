@@ -1,0 +1,20 @@
+---
+- name: Check Linux Version
+  hosts: server
+  gather_facts: true
+  tasks:
+    - name: Get Ubuntu version
+      command: "lsb_release -a"
+      register: ubuntu_version_output
+
+    - name: Display Ubuntu version
+      debug:
+        var: ubuntu_version_output.stdout_lines
+
+    - name: Get CentOS version
+      command: "cat /etc/centos-release"
+      register: centos_version_output
+
+    - name: Display CentOS version
+      debug:
+        var: centos_version_output.stdout_lines 

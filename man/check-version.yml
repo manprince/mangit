@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: server
   #gather_facts: yes
   remote_user: root
   become: yes
@@ -7,15 +7,15 @@
   tasks:
 #Ubuntu
 
-  # - name: Check versions ubuntu
-  #    shell: "lsb_release -a"
+   - name: Check versions ubuntu
+      shell: "lsb_release -a"
+      register: versions
+    when: >
+      ansible_distribution == 'Ubuntu'
+    - debug: var=versions.stdout
+  #  - name: Check versions centos
+  #    shell: "cat /etc/centos-release"
   #    register: versions
   #    when: >
-  #      ansible_distribution == 'Ubuntu'
+  #      ansible_distribution == 'CentOS'
   #  - debug: var=versions.stdout
-    - name: Check versions centos
-      shell: "cat /etc/centos-release"
-      register: versions
-      when: >
-        ansible_distribution == 'CentOS'
-    - debug: var=versions.stdout
