@@ -13,3 +13,5 @@
 
         msg: "Zabbix Agent version on {{ inventory_hostname }} is {{ zabbix_version_output.stdout_lines[0] }}"
         #msg: "Zabbix Agent version on {{ inventory-man }} is {{ zabbix_version_output.stdout_lines[0] }}"
+
+        #testsss
