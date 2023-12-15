@@ -1,0 +1,13 @@
+---
+- name: Check Linux Version
+  hosts: server
+  gather_facts: true
+  tasks:
+    - name: Get CentOS version
+      command: "rpm -q centos-release"
+      register: centos_version_output
+
+    - name: Display Ubuntu version
+      debug:
+        #var: centos_version_output.stdout_lines
+        msg: "Centos version on {{ inventory_hostname }} is {{ centos_version_output.stdout_lines[0] }}"

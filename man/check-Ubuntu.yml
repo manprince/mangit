@@ -11,11 +11,13 @@
       debug:
         #var: ubuntu_version_output.stdout_lines
         msg: "Ubuntu version on {{ inventory_hostname }} is {{ ubuntu_version_output.stdout_lines[1] }}"
+    
+   
+  #  - name: Get Ubuntu version
+  #     command: "lsb_release -a"
+  #     register: ubuntu_version_output
 
-    # - name: Get CentOS version
-    #   command: "cat /etc/centos-release"
-    #   register: centos_version_output
-
-    # - name: Display CentOS version
-    #   debug:
-    #     var: centos_version_output.stdout_lines 
+  #   - name: Display Ubuntu version
+  #     debug:
+  #       #var: ubuntu_version_output.stdout_lines
+  #       msg: "Ubuntu version on {{ inventory_hostname }} is {{ ubuntu_version_output.stdout_lines[1] }}"
