@@ -11,10 +11,10 @@
       debug:
         var: ubuntu_version_output.stdout_lines
 
-    - name: Get CentOS version
-      command: "cat /etc/centos-release"
-      register: centos_version_output
+    # - name: Get CentOS version
+    #   command: "cat /etc/centos-release"
+    #   register: centos_version_output
 
-    - name: Display CentOS version
-      debug:
-        var: centos_version_output.stdout_lines 
+    # - name: Display CentOS version
+    #   debug:
+    #     var: centos_version_output.stdout_lines 
