@@ -9,7 +9,8 @@
 
     - name: Display Ubuntu version
       debug:
-        var: ubuntu_version_output.stdout_lines
+        #var: ubuntu_version_output.stdout_lines
+        msg: "Ubuntu version on {{ inventory_hostname }} is {{ ubuntu_version_output.stdout_lines[1] }}"
 
     # - name: Get CentOS version
     #   command: "cat /etc/centos-release"
