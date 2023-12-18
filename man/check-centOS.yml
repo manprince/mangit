@@ -4,7 +4,9 @@
   gather_facts: true
   tasks:
     - name: Get CentOS version
-      command: "rpm -q centos-release"
+      #command: "rpm -q centos-release"
+      command: "cat /etc/centos-release"
+      
       register: centos_version_output
 
     - name: Display Ubuntu version

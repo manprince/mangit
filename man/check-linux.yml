@@ -9,7 +9,7 @@
       when: "'Ubuntu' in ansible_distribution"
 
     - name: Get CentOS version
-      command: "rpm -q centos-release"
+      command: "cat /etc/centos-release"
       register: centos_version_output
       when: "'CentOS' in ansible_distribution"
 
